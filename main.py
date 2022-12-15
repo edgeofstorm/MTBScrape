@@ -1,11 +1,13 @@
 import logging
+import os
 
 from db_handler.db_handler import DBHandler
 from email_handler.mail import EmailService
 from html_handler.html_creator import HTMLCreator
 from scrape_handler.handler import scrape
 
-logging.basicConfig(filename='scrape.log',
+path = os.path.abspath(os.getcwd())
+logging.basicConfig(filename=f'{path}/scrape.log',
                     format='%(levelname)s:%(asctime)s:%(message)s', level=logging.INFO)
 
 

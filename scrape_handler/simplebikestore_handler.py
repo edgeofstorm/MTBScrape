@@ -1,12 +1,14 @@
 import json
 import logging
+import os
 
 import requests
 from bs4 import BeautifulSoup
 
 from .scrape_handler_abc import ScrapeHandler
 
-logging.basicConfig(filename='scrape.log',
+path = os.path.abspath(os.getcwd())
+logging.basicConfig(filename=f'{path}/scrape.log',
                     format='%(levelname)s:%(asctime)s:%(message)s', level=logging.INFO)
 
 
@@ -21,7 +23,6 @@ class SimpleBikeStoreHandler(ScrapeHandler):
 
         soup = BeautifulSoup(page.content, "html.parser")
 
-        print(f"{'*'*25}  SimpleBikeStore DIRT JUMPS BEGIN  {'*'*25}")
         for child in soup.find_all("div", class_="product-block"):
             self.djs.append({
                 "bike": f"{child.find('div', class_='product-col-brand').text.strip()} {child.find('a', class_='product-block-title').text.strip()}",
@@ -31,7 +32,6 @@ class SimpleBikeStoreHandler(ScrapeHandler):
                 "img": (child.find('img').get('src') or child.find('img').get('data-src')).replace(' ', '%20'),
                 "store": "SimpleBikeStore"
             })
-        print(f"{'*'*25}  SimpleBikeStore DIRT JUMPS END  {'*'*25}")
 
         if not self.djs:
             logging.warning("Couldn't fetch bikes from SimpleBikeStore")
