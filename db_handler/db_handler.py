@@ -1,8 +1,8 @@
-import sqlite3
-from sqlite3 import Error
-from pathlib import Path
 import json
 import os
+import sqlite3
+from pathlib import Path
+from sqlite3 import Error
 
 
 class DBHandler():

@@ -1,7 +1,13 @@
-from .scrape_handler_abc import ScrapeHandler
-import requests
 import json
+import logging
+
+import requests
 from bs4 import BeautifulSoup
+
+from .scrape_handler_abc import ScrapeHandler
+
+logging.basicConfig(filename='scrape.log',
+                    format='%(levelname)s:%(asctime)s:%(message)s', level=logging.INFO)
 
 
 class WiggleHandler(ScrapeHandler):
@@ -28,6 +34,9 @@ class WiggleHandler(ScrapeHandler):
                 "store": "Wiggle"
             })
         print(f"{'*'*25}  WIGGLE DIRT JUMPS END  {'*'*25}")
+
+        if not self.djs:
+            logging.warning("Couldn't fetch bikes from Wiggle")
 
         return self.djs
 

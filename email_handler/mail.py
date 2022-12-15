@@ -1,8 +1,7 @@
 # from ..constants import EMAIL_FROM, EMAIL_TO, EMAIL_PASS
+import os
 import smtplib
 from email.message import EmailMessage
-import os
-
 
 EMAIL_FROM = os.environ.get("EMAIL_FROM", "enesekinci1907@gmail.com")
 EMAIL_TO = os.environ.get("EMAIL_TO", "enesekinci1907@gmail.com")
