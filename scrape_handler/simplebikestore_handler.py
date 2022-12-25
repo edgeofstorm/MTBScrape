@@ -7,9 +7,8 @@ from bs4 import BeautifulSoup
 
 from .scrape_handler_abc import ScrapeHandler
 
-path = os.path.abspath(os.getcwd())
-logging.basicConfig(filename=f'{path}/scrape.log',
-                    format='%(levelname)s:%(asctime)s:%(message)s', level=logging.INFO)
+
+logger = logging.getLogger()
 
 
 class SimpleBikeStoreHandler(ScrapeHandler):
@@ -34,7 +33,7 @@ class SimpleBikeStoreHandler(ScrapeHandler):
             })
 
         if not self.djs:
-            logging.warning("Couldn't fetch bikes from SimpleBikeStore")
+            logger.warning("Couldn't fetch bikes from SimpleBikeStore")
 
         return self.djs
 
