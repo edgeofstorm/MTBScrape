@@ -13,5 +13,6 @@ def scrape():
     djs = [*crc, *wiggle, *simple_bike_store]
     djs = sorted(djs, key=lambda bike: float(
         bike.get("price").strip('$€')), reverse=True)
+    djs = sorted(djs, key=lambda bike: bike.get("stock"), reverse=True)
 
     return djs

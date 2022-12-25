@@ -32,11 +32,24 @@ class WiggleHandler(ScrapeHandler):
                 "price": child.find('span', class_="bem-product-price__unit--grid").text.strip().replace(',', ''),
                 "url": child.find('a', class_="bem-product-thumb__name--grid").get('href'),
                 "img": f"https:{child.find('a', class_='bem-product-thumb__image-link--grid').find('img').get('src').replace(' ', '%20')}",
+                "stock": False,
                 "store": "Wiggle"
             })
 
         if not self.djs:
             logging.warning("Couldn't fetch bikes from Wiggle")
+        else:
+            # in stock only
+            page = requests.get(f"{self.url}&ris=1", verify=False)
+
+            soup = BeautifulSoup(page.content, "html.parser")
+
+            for child in soup.find_all("div", class_="products_details product_details_plp"):
+                bike = child.find(
+                    'a', class_="bem-product-thumb__name--grid").text.strip()
+
+                if index := next((index for (index, dj) in enumerate(self.djs) if dj["bike"] == bike), None):
+                    self.djs[index]["stock"] = True
 
         return self.djs
 

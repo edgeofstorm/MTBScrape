@@ -17,19 +17,28 @@ class SimpleBikeStoreHandler(ScrapeHandler):
     def __init__(self) -> None:
         self.url = "https://www.simplebikestore.eu/en/bikes/mountainbike/dirt-jump/?sort=highest&brand=0&mode=grid&sort=highest&max=6000&min=0&limit=72&sort=highest"
         self.djs = []
+        self.json_url = "https://www.simplebikestore.eu/en/bikes/mountainbike/dirt-jump/?format=json"
 
     def scrape(self):
+        response = requests.get(self.json_url, verify=False).json()
+
+        bikes = response["collection"]["products"]
+
         page = requests.get(self.url, verify=False)
 
         soup = BeautifulSoup(page.content, "html.parser")
 
         for child in soup.find_all("div", class_="product-block"):
+            id_ = json.loads(child.find(
+                'a', class_="quick-order-button").get("data-metadata")).get("id")
+            stock = bikes[f"{id_}"]["available"]
             self.djs.append({
                 "bike": f"{child.find('div', class_='product-col-brand').text.strip()} {child.find('a', class_='product-block-title').text.strip()}",
                 "discount": child.find('div', class_="product-sale").text.strip()[1:] if child.find('div', class_="product-sale") else None,
                 "price": child.find('div', class_="product-block-price").find('span', class_="price-excl bold").text.strip().replace('.', '').replace(',', '.'),
                 "url": child.find('a', class_="product-block-title").get('href'),
                 "img": (child.find('img').get('src') or child.find('img').get('data-src')).replace(' ', '%20'),
+                "stock": stock,
                 "store": "SimpleBikeStore"
             })
 
