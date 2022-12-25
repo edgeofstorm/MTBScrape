@@ -29,11 +29,23 @@ class CRCHandler(ScrapeHandler):
                 "price": child.find('ul').find('li', class_="fromamt").text.strip().split('-')[0] if '-' in child.find('ul').find('li', class_="fromamt").text.strip() else child.find('ul').find('li', class_="fromamt").text.strip(),
                 "url": f"https://www.chainreactioncycles.com{child.find('ul').find('a').get('href')}",
                 "img": child.find("img").get("src").replace(' ', '%20'),
+                "stock": False,
                 "store": "ChainReactionCycles"
             })
 
         if not self.djs:
             logger.warning("Couldn't fetch bikes from CRC")
+        else:
+            # in stock only
+            page = requests.get(f"{self.url}&f=2247", verify=False)
+
+            soup = BeautifulSoup(page.content, "html.parser")
+
+            for child in soup.find_all("div", class_="products_details product_details_plp"):
+                bike = child.find('ul').find('h2').text.strip()
+
+                if index := next((index for (index, dj) in enumerate(self.djs) if dj["bike"] == bike), None):
+                    self.djs[index]["stock"] = True
 
         return self.djs
 

@@ -31,6 +31,7 @@ class DBHandler():
                         discount text,
                         img text,
                         store text NOT NULL,
+                        stock bool NOT NULL,
                         UNIQUE(bike,store)
                     );"""
 
@@ -42,6 +43,7 @@ class DBHandler():
                                 discount text,
                                 img text,
                                 store text NOT NULL,
+                                stock bool NOT NULL,
                                 UNIQUE(bike,store)
                             );"""
 
@@ -63,28 +65,29 @@ class DBHandler():
         # bike_data = json.loads(self.bike_data)
         # djs = bike_data.get("djs", [])
         # mtbs = bike_data.get("mtbs", [])
-        notifications = {"djsInsert": [], "djsPriceUpdate": []}
+        notifications = {"djsInsert": [],
+                         "djsPriceUpdate": [], "djsStockUpdate": []}
 
         for dj in bike_data:
             cur = self.conn.cursor()
             # WHERE bike=?", (dj["bike"],))
             cur.execute(
-                "SELECT bike, price, url, discount, img, store FROM DJ WHERE bike=? AND store=?", (dj["bike"], dj["store"],))
+                "SELECT bike, price, url, discount, img, store, stock FROM DJ WHERE bike=? AND store=?", (dj["bike"], dj["store"],))
 
             rows = cur.fetchall()
 
             if not rows:
-                insert_sql = ''' INSERT INTO DJ(bike,price,url,discount,img,store)
-                VALUES(?,?,?,?,?,?) '''
+                insert_sql = ''' INSERT INTO DJ(bike,price,url,discount,img,store,stock)
+                VALUES(?,?,?,?,?,?,?) '''
                 # cur = conn.cursor()
                 bike = (dj["bike"], dj["price"], dj["url"],
-                        dj["discount"], dj["img"], dj["store"],)
+                        dj["discount"], dj["img"], dj["store"], dj["stock"],)
                 cur.execute(insert_sql, bike)
                 self.conn.commit()
                 notifications["djsInsert"].append({**dj, "oldPrice": ""})
                 continue
 
-            bike, price, url, discount, img, store = rows[0]
+            bike, price, url, discount, img, store, stock = rows[0]
             if price != dj["price"]:
                 update_sql = ''' UPDATE DJ
                         SET price = ? ,
@@ -96,6 +99,14 @@ class DBHandler():
                 self.conn.commit()
                 notifications["djsPriceUpdate"].append(
                     {**dj, "oldPrice": price})
+            if stock != dj["stock"]:
+                update_sql = ''' UPDATE DJ
+                        SET stock = ?
+                        WHERE bike = ? AND store = ?'''
+                bike_updated = (dj["stock"], dj["bike"], dj["store"],)
+                cur.execute(update_sql, bike_updated)
+                self.conn.commit()
+                notifications["djsStockUpdate"].append({**dj, "oldPrice": ""})
 
         if self.conn:
             self.conn.close()

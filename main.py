@@ -31,6 +31,11 @@ def main():
             EmailService.send_email(
                 subject="DJ Bikes New Product(s)", html=html)
             logger.info(f"{'*'*25}  DJ INSERT EMAIL SENT  {'*'*25}")
+        if djs := notifications["djsStockUpdate"]:
+            html = HTMLCreator().create_html(djs)
+            EmailService.send_email(
+                subject="DJ Bikes Stock Update", html=html)
+            logging.info(f"{'*'*25}  DJ STOCK EMAIL SENT  {'*'*25}")
     except Exception as e:
         logger.error("Exception occured", exc_info=True)
     else:
