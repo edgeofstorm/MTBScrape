@@ -3,6 +3,7 @@ import os
 
 from db_handler.db_handler import DBHandler
 from email_handler.mail import EmailService
+from whatsapp_handler.whatsapp import WhatsappService
 from html_handler.html_creator import HTMLCreator
 from scrape_handler.handler import scrape
 from custom_logging.formatters import CloudLoggingFormatter
@@ -25,17 +26,23 @@ def main():
             html = HTMLCreator().create_html(djs)
             EmailService.send_email(
                 subject="DJ Bikes Price Update(s)", html=html)
-            logger.info(f"{'*'*25}  DJ UPDATE EMAIL SENT  {'*'*25}")
+            logger.info(f"{'*'*25}  DJ PRICE UPDATE EMAIL SENT  {'*'*25}")
+            WhatsappService.send_whatsapp_message()
+            logger.info(f"{'*'*25}  DJ PRICE UPDATE EMAIL SENT  {'*'*25}")
         if djs := notifications["djsInsert"]:
             html = HTMLCreator().create_html(djs)
             EmailService.send_email(
                 subject="DJ Bikes New Product(s)", html=html)
             logger.info(f"{'*'*25}  DJ INSERT EMAIL SENT  {'*'*25}")
+            WhatsappService.send_whatsapp_message()
+            logger.info(f"{'*'*25}  DJ INSERT EMAIL SENT  {'*'*25}")
         if djs := notifications["djsStockUpdate"]:
             html = HTMLCreator().create_html(djs)
             EmailService.send_email(
                 subject="DJ Bikes Stock Update", html=html)
-            logging.info(f"{'*'*25}  DJ STOCK EMAIL SENT  {'*'*25}")
+            logging.info(f"{'*'*25}  DJ STOCK UPDATE EMAIL SENT  {'*'*25}")
+            WhatsappService.send_whatsapp_message()
+            logging.info(f"{'*'*25}  DJ STOCK UPDATE EMAIL SENT  {'*'*25}")
     except Exception as e:
         logger.error("Exception occured", exc_info=True)
     else:
